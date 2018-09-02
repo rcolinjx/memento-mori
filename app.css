@@ -1,0 +1,16 @@
+* {
+	background-color: #000;
+	color: #fff;
+	
+}
+h1 {
+	font-style: italic;
+	text-align: center;
+}
+div {
+	line-height: .4vw;
+	text-align: center;
+}
+span {
+	font-size: .4vw;
+}
