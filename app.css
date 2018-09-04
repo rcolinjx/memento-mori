@@ -7,10 +7,15 @@ h1 {
 	font-style: italic;
 	text-align: center;
 }
-div {
-	line-height: .4vw;
-	text-align: center;
+div.wrapper {
+	line-height: .5vw;
+	display: flex;
+	justify-content: center;
 }
-span {
-	font-size: .4vw;
+div.life {
+	text-align: left;	
+}
+span.year {
+	font-size: .5vw;
+	display: inline-block;
 }

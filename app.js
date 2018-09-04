@@ -1,50 +1,32 @@
-// enum DayType
-// {
-//	Unlivable = 0
-// 	,Lived = 1
-//	,WillLive = 2
-//	,Today = 3
-// }
-
-// classes
 function Day()
 {
 	var self = {};
 	
+	self.MonthNum;
+	self.MonthDayNum;
+	self.LifeDayNum;
 	self.Type;
 	
 	return self;
 }
 
-function Month()
-{
-	var self = {};
-	
-	self.MonthNum;
-	self.Days = [];
-	
-	self.DayCount;
-	
-	return self;
-}
 
 function Year()
 {
 	var self = {};
 	
 	self.YearNum;
-	self.Months = [];
+	self.Days = [];
 	
-	self.YearDayCount = function()
+	self.DayCount = function()
 	{
-		var total = self.Months.reduce(function(prev, cur) {
-			return prev + cur.DayCount;
-		}, 0);
+		var total = self.Days.length;
 		return total;
 	}
 	
 	return self;
 }
+
 function Life()
 {
 	var self = {};
@@ -54,8 +36,17 @@ function Life()
 	self.Years = [];
 	
 	self.BirthString = function(){
-		return BirthYearNum + '0101';
+		return '01/24/' + self.BirthYearNum;
 	};
+	
+	self.DayCount = function()
+	{
+		var total = self.Years.reduce(function(prev, cur) {
+			return prev + cur.DayCount();
+		},0);
+		
+		return total;
+	}
 	
 	return self;
 }
@@ -66,42 +57,71 @@ function AppViewModel() {
 	self.life = Life();
 	self.today = moment();
 
-	self.birthMoment = moment(self.life.BirthString);
-	self.deathMoment = moment(self.birthMoment).add(self.life.DeathAge,'years');
+	self.birthMoment = moment(self.life.BirthString());
+	self.deathMoment = self.birthMoment.clone().add(self.life.DeathAge,'years');
 
-	self.totalDays = self.deathMoment.diff(self.birthMoment,'days');
-	self.elapsedDays = self.today.diff(self.birthMoment,'days');
-
-	self.remainingDays = self.totalDays - self.elapsedDays;
+	self.firstDayNum = self.birthMoment.dayOfYear();
+	self.numberOfDays = self.deathMoment.diff(self.birthMoment,'days');
+	self.lastDayNum = self.numberOfDays + self.deathMoment.dayOfYear();
+	self.todayNum = self.today.diff(self.birthMoment,'days');
+	
+	self.lifeDayIndex = 0;
 	
 	// for each year
-	for (var i = 0; i < self.life.DeathAge; i++)
+	for (var i = 0; i <= self.life.DeathAge; i++)
 	{
 		var yearNum = self.life.BirthYearNum + i;
 		var year = Year();
 
 		year.YearNum = yearNum;
-
+		
+		var yearDayIndex = 0;
+		
 		// for each month, calculate number of days
 		for (var j = 0; j < 12; j++)
 		{
 			var monthNum = j + 1;
-			var month = Month();
-
-			month.MonthNum = monthNum;
-			month.DayCount = 
-				moment(monthNum + '-' + yearNum, 'M-YYYY').daysInMonth();
 			
-			// if month before birth month
+			var k = moment(monthNum + '-' + yearNum, 'M-YYYY').daysInMonth();
 			
-			// if month is birth month
-			// if month is before today
-			// if date is today
-			// if date is after death
-
-			year.Months[j] = month;
+			// for each day
+			for (var l = 0; l < k; l++)
+			{
+				var dayNum = l + 1;
+				var lifeDayNum = self.lifeDayIndex + 1;
+				var day = Day();
+				
+				day.MonthNum = monthNum;
+				day.MonthDayNum = dayNum;
+				day.LifeDayNum = lifeDayNum;
+				
+				// lived
+				if (lifeDayNum < self.todayNum)
+				{
+					day.Type = 'gray';
+				}
+				// unlived
+				if (lifeDayNum < self.firstDayNum
+				    || lifeDayNum > self.lastDayNum)
+				{
+					day.Type = 'black';
+				}
+				// today
+				if (lifeDayNum === self.todayNum)
+				{
+					day.Type = 'red';
+				}
+				// to live
+				if (day.Type===undefined)
+				{
+					day.Type = 'white'
+				};
+				
+				year.Days[yearDayIndex] = day;
+				yearDayIndex = yearDayIndex + 1;
+				self.lifeDayIndex = lifeDayNum;
+			}
 		}
-
 		self.life.Years[i] = year;
 	}
 }
