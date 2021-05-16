@@ -58,12 +58,12 @@ function AppViewModel() {
 	self.today = moment();
 
 	self.birthMoment = moment(self.life.BirthString());
-	self.deathMoment = self.birthMoment.clone().add(self.life.DeathAge,'years');
+	self.deathMoment = self.birthMoment.clone().add(self.life.DeathAge, 'years');
 
 	self.firstDayNum = self.birthMoment.dayOfYear();
-	self.numberOfDays = self.deathMoment.diff(self.birthMoment,'days');
+	self.numberOfDays = self.deathMoment.diff(self.birthMoment, 'days');
 	self.lastDayNum = self.numberOfDays + self.deathMoment.dayOfYear();
-	self.todayNum = self.today.diff(self.birthMoment,'days');
+	self.todayNum = self.today.diff(self.birthMoment, 'days');
 	
 	self.lifeDayIndex = 0;
 	
@@ -112,7 +112,7 @@ function AppViewModel() {
 					day.Type = 'red';
 				}
 				// to live
-				if (day.Type===undefined)
+				if (day.Type === undefined)
 				{
 					day.Type = 'white'
 				};
